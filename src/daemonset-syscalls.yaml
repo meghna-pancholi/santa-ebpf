@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: timeloops-daemonset
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      name: timeloops-daemonset
+  template:
+    metadata:
+      labels:
+        name: timeloops-daemonset
+    spec:
+      containers:
+      - name: timeloops-daemonset
+        image: meghnapancholi/controller:timeloops21
+        imagePullPolicy: Always  
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: lib-modules
+          mountPath: /lib/modules
+        - name: usr-src
+          mountPath: /usr/src
+        - name: tracing
+          mountPath: /sys/kernel/debug
+        - name: proc
+          mountPath: /hostproc
+          readOnly: true
+        - name: docker-info
+          mountPath: /var/lib/docker
+          readOnly: true
+        - name: container-info
+          mountPath: /var/lib/containerd/
+          readOnly: true
+        - name: container-run
+          mountPath: /run/containerd/
+      volumes:
+      - name: lib-modules
+        hostPath:
+          path: /lib/modules
+      - name: usr-src
+        hostPath:
+          path: /usr/src
+      - name: tracing
+        hostPath:
+          path: /sys/kernel/debug
+      - name: proc
+        hostPath:
+          path: /proc
+      - name: docker-info
+        hostPath: 
+          path: /var/lib/docker
+      - name: container-info
+        hostPath: 
+          path: /run/containerd/io.containerd.runtime.v2.task/k8s.io
+      - name: container-run
+        hostPath:
+          path: /run/containerd
